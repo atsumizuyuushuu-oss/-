@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ファームアシスト 🐰</title>
+
+    <!-- iOS ホーム画面追加（PWA）用の設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ファームアシスト">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/cute-clipart/512/rabbit.png">
+
+    <style>
+        :root {
+            --bg-color: #fff0f5;
+            --card-bg: #ffffff;
+            --primary-color: #ab47bc;
+            --accent-color: #ff80ab;
+            --warning-bg: #fff8e1;
+            --warning-border: #ffe082;
+            --text-color: #4a4a4a;
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 430px;
+            background-color: #faf7f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        header {
+            background: linear-gradient(135deg, #ce93d8, #f48fb1);
+            color: white;
+            padding: 45px 20px 15px;
+            text-align: center;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 15px rgba(206, 147, 216, 0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 0.8rem;
+            opacity: 0.95;
+        }
+
+        /* タブ切り替えナビゲーション */
+        .nav-tabs {
+            display: flex;
+            background: #fff;
+            margin: 12px 15px 0;
+            border-radius: 15px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #888;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #f3e5f5;
+            color: var(--primary-color);
+        }
+
+        .content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(171, 71, 188, 0.08);
+            border: 1px solid #f8bbd0;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #6a1b9a;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ab47bc, #ec407a);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(171, 71, 188, 0.25);
+            margin-bottom: 10px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #78909c, #b0bec5);
+            margin-top: 5px;
+        }
+
+        .btn-fb {
+            background: linear-gradient(135deg, #ff7043, #ffa726);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #f48fb1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: #fff;
+            outline: none;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        /* アドバイス表示枠 */
+        .advice-banner {
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .advice-banner h3 {
+            margin: 0 0 6px 0;
+            color: #e65100;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .advice-banner p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #5d4037;
+            line-height: 1.4;
+        }
+
+        /* 履歴リストアイテム */
+        .history-item {
+            background: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .history-text {
+            font-size: 0.85rem;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .history-choice {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <header>
+        <h1>🐰 ファームアシスト</h1>
+        <p>登録販売者の相談サポート＆学習ノート✨</p>
+    </header>
+
+    <!-- タブ切替 -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('inputTab')">💬 相談メモ</button>
+        <button class="tab-btn" onclick="switchTab('historyTab')">📚 ケースブック</button>
+        <button class="tab-btn" onclick="switchTab('feedbackTab')">💌 改善メモ</button>
+    </div>
+
+    <div class="content">
+        <!-- 【タブ1：相談・聞き取り】 -->
+        <div id="inputTab" class="tab-content active">
+            
+            <!-- 大きなアドバイス枠 -->
+            <div id="adviceBanner" class="advice-banner">
+                <h3>💡 くすピョンの注意チェック</h3>
+                <p id="adviceText">持病や服用中のお薬がないか確認しましょう！</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎙️ 聞き取り・症状メモ</div>
+                <button class="btn" onclick="simulateVoiceInput()">🎤 音声聞き取りスタート</button>
+                <textarea id="memoInput" rows="3" placeholder="「50代男性、昨日から高熱と強い喉の痛み。高血圧の薬を服用中」など..." oninput="checkAdvice()"></textarea>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🧠 登録販売者の最終判断</div>
+                <input type="text" id="finalChoice" placeholder="推奨するお薬や受診勧奨を選択・記入">
+                <button class="btn" onclick="saveCase()">✨ 本日の結果を記録・保存</button>
+                <button class="btn btn-clear" onclick="clearForm()">🔄 次の相談へ（クリア）</button>
+            </div>
+        </div>
+
+        <!-- 【タブ2：履歴・ケースブック】 -->
+        <div id="historyTab" class="tab-content">
+            <div class="card">
+                <div class="card-title">📖 あなたの接客振り返りノート</div>
+                <div id="historyList">
+                    <p style="color:#aaa; font-size:0.85rem; text-align:center;">まだ記録がありません🌸</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 【タブ3：改善点フィードバック】 -->
+        <div id="feedbackTab" class="tab-content">
+            <div class="card">
+                <div class="card-title">📝 使ってみての改善リクエスト</div>
+                <p style="font-size:0.8rem; color:#666;">「ここが押しづらい」「こんなテンプレが欲しい」などを教えてね！</p>
+                <textarea id="fbInput" rows="3" placeholder="改善点やご意見を自由に入力..."></textarea>
+                <button class="btn btn-fb" onclick="sendFeedback()">💌 開発者へ送信</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // タブ切り替え
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // 音声認識（シミュレーション）
+    function simulateVoiceInput() {
+        const text = "50代男性、昨日からの発熱と喉の痛み。降圧薬（高血圧）を毎朝服用中。";
+        document.getElementById('memoInput').value = text;
+        checkAdvice();
+    }
+
+    // リアルタイムアドバイス（大きめ表示）
+    function checkAdvice() {
+        const text = document.getElementById('memoInput').value;
+        const banner = document.getElementById('adviceBanner');
+        const adviceText = document.getElementById('adviceText');
+
+        if (text.includes("高血圧") || text.includes("降圧薬")) {
+            adviceText.innerHTML = "<b>【高血圧に注意】</b><br>プソイドエフェドリン等の交感神経刺激成分が含まれていない風邪薬をお選びください。";
+            banner.style.display = "block";
+        } else if (text.includes("高熱") || text.includes("熱")) {
+            adviceText.innerHTML = "<b>【症状確認】</b><br>高熱が数日続いている場合は、インフルエンザ等の感染症も考慮し受診勧奨をご検討ください。";
+            banner.style.display = "block";
+        } else {
+            banner.style.display = "none";
+        }
+    }
+
+    // ケース保存
+    function saveCase() {
+        const memo = document.getElementById('memoInput').value;
+        const choice = document.getElementById('finalChoice').value;
+
+        if(!memo || !choice) {
+            alert("「聞き取りメモ」と「最終判断」の両方を入力してね！🐰");
+            return;
+        }
+
+        const now = new Date();
+        const dateStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        const historyList = document.getElementById('historyList');
+        if (historyList.innerHTML.includes("まだ記録がありません")) {
+            historyList.innerHTML = "";
+        }
+
+        const itemHtml = `
+            <div class="history-item">
+                <div class="history-date">📅 ${dateStr}</div>
+                <div class="history-text">📋 相談：${memo}</div>
+                <div class="history-choice">💡 登録販売者の判断：${choice}</div>
+            </div>
+        `;
+
+        historyList.innerHTML = itemHtml + historyList.innerHTML;
+        alert("🎉 ケースブックに保存しました！お疲れ様でした✨");
+        clearForm();
+    }
+
+    // フォームクリア
+    function clearForm() {
+        document.getElementById('memoInput').value = "";
+        document.getElementById('finalChoice').value = "";
+        document.getElementById('adviceBanner').style.display = "none";
+    }
+
+    // フィードバック送信
+    function sendFeedback() {
+        const fb = document.getElementById('fbInput').value;
+        if(!fb) {
+            alert("改善点の内容を入力してね📝");
+            return;
+        }
+        alert("💌 改善点を受け付けました！「" + fb + "」ですね。ありがとうございます！✨");
+        document.getElementById('fbInput').value = "";
+    }
+</script>
+
+</body>
+</html>
